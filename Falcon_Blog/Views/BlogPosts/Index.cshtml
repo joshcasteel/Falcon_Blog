@@ -1,0 +1,100 @@
+﻿@using PagedList
+@using PagedList.Mvc
+@using Falcon_Blog.Models
+@model IPagedList<BlogPost>
+
+@{
+    ViewBag.Title = "Index";
+}
+    <div class="container-fluid pt-5 m-3">
+        <div class="row">
+            <h2>Index</h2>
+        </div>
+        <div class="row">
+            <p>
+                @Html.ActionLink("Create New", "Create", "BlogPosts", null, new { @class = "btn btn-dark" })
+            </p>
+        </div>
+        <div class="row">
+            @using (Html.BeginForm("Index", "BlogPosts", FormMethod.Get, htmlAttributes: new { @class = "form" }))
+            {
+                <div class="controls controls-row search-row">
+                    <input id="searchStr" name="searchStr" class="input-block-level" type="text" placeholder="Search">
+                    <button id="btnSearchStr" name="btnSearchStr" class="btn btn-dark" type="submit">Search</button>
+                </div>
+            }
+        </div>
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif">
+                    <tr>
+                        <th>
+                            @Html.DisplayName("Created")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Updated")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Title")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Slug")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Abstract")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Body")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Image")
+                        </th>
+                        <th>
+                            @Html.DisplayName("IsPublished")
+                        </th>
+                        <th></th>
+                    </tr>
+                    
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Created)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Updated)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Title)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Slug)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Abstract)
+                            </td>
+                            <td>
+                                @Html.Raw(item.Body)
+                            </td>
+                            <td>
+                                @if (item.MediaUrl != null)
+                                {
+                                    <img class="img-responsive" src="@item.MediaUrl" alt="@item.Title" />
+                                }
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.IsPublished)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", "BlogPosts", new { slug = item.Slug }, new { @class = "btn btn-warning p-2 m-1" })
+                                @Html.ActionLink("Details", "Details", new { slug = item.Slug }, new { @class = "btn btn-info p-2 m-1" })
+                                @Html.ActionLink("Delete", "Delete", new { slug = item.Slug }, new { @class = "btn btn-danger p-2 m-1" })
+                            </td>
+                        </tr>
+                    }
+
+                </table>
+        </div>
+    </div>
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchStr = ViewBag.Search }))
+</div>

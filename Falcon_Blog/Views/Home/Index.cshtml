@@ -1,0 +1,52 @@
+﻿@using Falcon_Blog.Models
+@using PagedList
+@using PagedList.Mvc
+@model IPagedList<BlogPost>
+    <header class="masthead" style="background-image: url('/Images/home-bg.jpeg')">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="site-heading">
+                        <h1 style="font-family: 'Lobster', cursive; color:#ffffff";>Josh's Blog</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+ <!-- Main Content -->
+<div class="container">
+    <div class="row" style="display: block">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            
+            @foreach (var post in Model)
+            {
+                <div class="post-preview">
+                    <a href="@Url.Action("Details", "BlogPosts", new { slug = post.Slug })">
+                        <h2 class="post-title">
+                            @post.Title
+                        </h2>
+                        <h3 class="post-subtitle text-truncate">
+
+                            @Html.Raw(post.Abstract)
+
+                        </h3>
+                    </a>
+                    <p class="post-meta">
+
+                        Posted by
+                        Josh Casteel
+                        on @post.Created.ToString("MMM-dd-yyyy")
+                    </p>
+                </div>
+
+                <hr>
+            }
+            <!-- Pager -->
+        <div class="pagination">
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page, searchStr = ViewBag.Search }))
+        </div>
+        </div>
+    </div>
+</div>

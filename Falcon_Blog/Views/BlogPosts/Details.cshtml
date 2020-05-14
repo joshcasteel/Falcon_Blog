@@ -1,0 +1,108 @@
+﻿@using Falcon_Blog.Models
+@model BlogPost
+
+
+<!-- Page Header -->
+<header class="masthead" style="background-image: url('/Images/post-bg@(ViewBag.Rand).jpg')">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto text-center">
+                <div class="post-heading">
+                    <h1>@Model.Title</h1>
+                    <h2 class="subheading">@Model.Abstract</h2>
+                    <span class="meta">
+                        Posted by
+                        Josh Casteel
+                        on @Model.Created.ToString("MMM-dd-yyyy")
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto text-center">
+                @if (Model.MediaUrl != null)
+                {
+                    <img class="img-responsive" src="@Model.MediaUrl" alt="" />
+                }
+                 <p>@Html.Raw(@Model.Body)</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-center">
+                @if (User.IsInRole("Admin"))
+                {
+                    @Html.ActionLink("Edit", "Edit", "BlogPosts", new { slug = Model.Slug }, new { @class = "btn btn-dark shadow m-3" })
+                    @Html.ActionLink("Delete", "Delete", "BlogPosts", new { slug = Model.Slug }, new { @class = "btn btn-danger shadow m-3" })
+                }
+            </div>
+        </div>
+    </div>
+</article>
+
+<Article>
+    <div class="row pt-5">
+        <div class="col-lg-8 text-center mx-auto">
+            <div class="post-heading">
+                <h3 class="pb-3">Comments (@Model.Comments.Count):</h3>
+                @foreach (var comment in Model.Comments)
+                {
+                    <div class="card text-center mx-auto shadow" style="width: 30rem;">
+                        <div class="card-body m-2">
+                            <h6 class="card-text p-2">@comment.CommentBody</h6>
+                            <sub>Posted by @comment.Author.FirstName @comment.Author.LastName on @comment.Created.ToString("MMM-dd-yyyy") at @comment.Created.ToString("h:m tt")</sub>
+                            @if (User.IsInRole("Moderator") || User.IsInRole("Admin"))
+                            {
+                                <div class="row p-2">
+                                    <div class="col text-center btn-group-sm">
+                                        @Html.ActionLink("Edit", "Edit", "Comments", new { id = comment.Id }, new { @class = "btn-sm btn btn-dark" })
+                                        @Html.ActionLink("Delete", "Delete", "Comments", new { id = comment.Id }, new { @class = "btn-sm btn btn-danger" })
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <br />
+                }
+            </div>
+        </div>
+    </div>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <hr />
+        <div class="container text-center mx-auto">
+            <div class="row">
+                <div class="col-8 mx-auto">
+                    @using (Html.BeginForm("Create", "Comments", FormMethod.Post, new { @class = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            @Html.Label("Leave a comment", htmlAttributes: new { @class = "control-label h5" }) <br />
+                            @Html.TextArea("CommentBody", new { @class = "form-control shadow", rows = "3" }) <br />
+
+                            @Html.HiddenFor(model => model.Slug)
+                            @Html.Hidden("blogPostId", Model.Id)
+                            <button type="submit" class="btn btn-dark">Comment</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    }
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <div class="row">
+            <div class="col text-center mx-auto">
+                <p>@Html.ActionLink("Login", "Login", "Account", null, new { @class = "btn btn-dark" }) or @Html.ActionLink("Register", "Register", "Account", null, new { @class = "btn btn-info" })</p>
+                <p>to leave a comment</p>
+            </div>
+        </div>
+    }
+</Article>
